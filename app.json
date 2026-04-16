@@ -28,6 +28,12 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
+      },
+      "package": "com.aravindtanneri.passwordApp"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "f4ec6780-2145-4c64-80e4-86d03faa5437"
       }
     }
   }
