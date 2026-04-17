@@ -1,6 +1,7 @@
 import './global.css'; 
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaView, ScrollView, Text, TouchableOpacity, View, Alert } from 'react-native';
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 
 // External Libraries
 import BouncyCheckbox from "react-native-bouncy-checkbox";
@@ -59,7 +60,7 @@ export default function App() {
     setTimeout(() => setIsCopied(false), 2000);
   };
 
-  const generatePasswordString = (passwordLength: number) => {
+  const generatePasswordString = async (passwordLength: number) => {
     let characterList = '';
     if (upperCase) characterList += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     if (lowerCase) characterList += 'abcdefghijklmnopqrstuvwxyz';
@@ -71,6 +72,17 @@ export default function App() {
     setIsPassGenerated(true);
     evaluateStrength(passwordResult);
     setHistory(prevHistory => [passwordResult, ...prevHistory].slice(0, 5));
+
+    try {
+      await AsyncStorage.setItem('passwordHistory', JSON.stringify(History));
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: 'Storage Error 💾',
+        text2: 'Could not save this password to your history.',
+        position: 'bottom'
+      });
+    }
   };
 
   const createPassword = (characters: string, passwordLength: number) => {
@@ -126,6 +138,25 @@ export default function App() {
       </View>
     </TouchableOpacity>
   );
+
+  useEffect(() => {
+    const loadHistory = async () => {
+      try {
+        const savedHistory = await AsyncStorage.getItem('passwordHistory');
+        if (savedHistory !== null) {
+          setHistory(JSON.parse(savedHistory));
+        }
+      } catch (error) {
+        Toast.show({
+          type: 'error',
+          text1: 'Oops! ⚠️',
+          text2: 'Failed to load your password history.',
+          position: 'bottom'
+        });
+      }
+    };
+    loadHistory();
+  }, []);
 
   return (
     <>
